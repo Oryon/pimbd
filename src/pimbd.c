@@ -40,7 +40,7 @@
 #define IPC_NAME "pimb-ipc"
 #define IPC_UTILITY "pimbc"
 
-int log_level = 7;
+int log_level = 4;
 char use_syslog = 0;
 char show_date = 0;
 const char *log_prefix = " pimbd: ";
@@ -80,6 +80,7 @@ void usage() {
 		   " -s <sock-path> Specify the IPC unix socket path to use.\n"
            " -S Use syslog for logs.\n"
            " -l <log-file> Specify a log file (incompatible with syslog enabled).\n"
+		   " -L <log-level> Log verbosity between 0 and 9.\n"
            " -p <pid-file> The process pid is written to that file if initialization succeeds.\n");
 }
 
@@ -117,10 +118,11 @@ int pimbd(int argc, char *const *argv) {
 		int opt;
 		char *conffile = NULL;
 		char *logfile = NULL;
+		char *loglevel = NULL;
 		char *pidfile = NULL;
 		char *sockpath = IPC_SOCKSERVER;
 		char usyslog = 0;
-		while ((opt = getopt(argc, argv, "hc:s:l:Sp:")) != -1) {
+		while ((opt = getopt(argc, argv, "hc:s:l:L:Sp:")) != -1) {
 			switch (opt) {
 			case 'c':
 				conffile = optarg;
@@ -137,6 +139,9 @@ int pimbd(int argc, char *const *argv) {
 			case 'l':
 				logfile = optarg;
 				break;
+			case 'L':
+				loglevel = optarg;
+				break;
 			case 'p':
 				pidfile = optarg;
 				break;
@@ -145,6 +150,15 @@ int pimbd(int argc, char *const *argv) {
 				usage();
 				return -1;
 			}
+		}
+
+		if(loglevel) {
+			int l = atoi(loglevel);
+			if(l<0 || l>9) {
+				L_ERR("Log level must be between 0 and 9.");
+				return -1;
+			}
+			log_level = l;
 		}
 
 		if(uloop_init()) {

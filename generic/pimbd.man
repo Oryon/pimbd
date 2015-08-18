@@ -13,6 +13,7 @@ pimbd \- PIM BIDIR dual-stack daemon.
 [\fB\-s\fR \fIipc-sock-path\fR]
 [\fB\-S\fR]
 [\fB\-l\fR \fIlog-file\fR]
+[\fB\-L\fR \fIlog-level\fR]
 [\fB\-p\fR \fIpid-file\fR]
 
 
@@ -52,6 +53,10 @@ Use syslog instead of standard output for logging messages.
 .TP
 .BI \-l " log-file"
 Specify a log file instead of standard output.
+
+.TP
+.BI \-L " log-level"
+Specify the log level between 0 and 9 (default is 4).
 
 .TP
 .BI \-p " pid-file"
