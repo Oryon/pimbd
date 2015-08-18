@@ -2,12 +2,13 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=pimbd
 PKG_SOURCE_VERSION:=GIT_COMMIT_ID
-PKG_VERSION:=2014-09-22-$(PKG_SOURCE_VERSION)
+PKG_VERSION:=2015-08-18-$(PKG_SOURCE_VERSION)
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/Oryon/pimbd.git
 PKG_MAINTAINER:=Pierre Pfister <pierre.pfister@darou.fr>
+PKG_LICENSE:=Apache-2.0
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
@@ -17,9 +18,6 @@ include $(INCLUDE_DIR)/cmake.mk
 
 # Spammy debug builds for now
 CMAKE_OPTIONS += -DL_LEVEL=7
-
-# No Openwrt specific yet
-CMAKE_OPTIONS += -DPLATFORM=linux
 
 define Package/pimbd
   SECTION:=net
@@ -32,7 +30,8 @@ endef
 
 define Package/pimbd/description
 This package provides a daemon which implements the Protocol Independent
-Multicast BIDIR routing protocol.
+Multicast BIDIR routing protocol. Note that a routing protocol must be 
+installed and running in order for PIM to function.
 endef
 
 define Package/pimbd/install
@@ -42,6 +41,8 @@ define Package/pimbd/install
 	ln -s pimbd $(1)/usr/sbin/pimb-ipc
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/pimbd.init $(1)/etc/init.d/pimbd
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_BIN) files/firewall-uci.sh $(1)/etc/uci-defaults/99_pimbd_firewall
 endef
 
 $(eval $(call BuildPackage,pimbd))
