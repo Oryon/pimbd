@@ -1,0 +1,168 @@
+.\" Manpage for pimbc.
+.\" Contact pierre at darou.fr to correct errors or typos.
+.TH pimbc 8
+.SH NAME
+pimbc \- pimbd configuration and monitoring utility.
+.SH SYNOPSIS
+.B pimbc
+[\fB\-s\fR \fIsock-path\fR]
+[\fB\-v\fR]
+[\fB\-d\fR]
+[\fB\-t\fR timeout\fR]
+.IR COMMAND
+.SS COMMANDS
+
+.B help
+
+.B link [ list | set ... ]
+
+.B rpa [ list | set ... | flush ... ]
+
+.B group [ list | set ... ]
+
+.B proxy [ list | set ... ]
+
+.B rib 
+
+.B raw 
+.I json-arguments
+
+.B file 
+.I file-path
+
+.SH DESCRIPTION
+.B pimbc 
+is the companion configuration and monitoring utility of 
+.B pimbd
+, a PIM-BIDIR dual stack implementation. It translates commands into json and sends them to 
+.B pimbd 
+through a unix socket. If 
+.B pimbd 
+returns an error message, or an json object, it is displayed.
+.SH OPTIONS
+.TP
+.BI \-s " unix-socket-path"
+Specify a custom unix socket IPC path. The default is 
+.BR /tmp/pimbd_ipc_server.sock .
+.TP
+.BI \-v
+Specify whether the command should operate in verbose mode.
+.TP
+.BI \-d
+Specify whether 
+.B dry-run
+mode should be enabled. When enabled, syntax is checked but nothing is sent to 
+.B pimbd.
+Note that this operation success does not ensure that sending the same command to 
+.B pimbd
+would succeed as 
+.B pimbd 
+performs additional checks. 
+.TP
+.BI \-t " timeout"
+Specify the timeout in seconds during which the IPC should keep trying to connect to 
+.B pimbd.
+The default is 4.
+.SH COMMANDS
+.SS help
+Display help text.
+.SS link  \fI link-commands
+Display and configure interfaces.
+.TP
+.B list
+Dumps pimbd link information in json format.
+.TP
+.B set " dev \fI link-name options"
+.RS
+.TP
+.BR "pim { on | off }"
+Enable or disable PIM BIDIR on this interface.
+.TP
+.BR "ssbidir { on | off }"
+Enable or disable SSBIDIR on this interface. SSBIDIR enables source-specific multicast traffic filtering. This mode of operation is compatible with BIDIR-only routers.
+.TP
+.BR "mld { on | off }"
+Enable or disable MLDv2 querier on this interface.
+.TP
+.BR "igmp { on | off }"
+Enable or disable UGMPv3 querier on this interface.
+.TP
+.BR "proxy {\fI ADDRESS PORT \fB| off }"
+Enable or disable PIM Border Proxy on this interface. The
+.I ADDRESS
+and 
+.I PORT
+determines the local address and port pimbd will listen to in order to receive proxy-controller incoming TCP connexions. Subscription state received from multiple proxy controllers is aggregated and translated into MLDv2 and IGMPv3 on the given interface. When multicast traffic is received on the interface, the proxy state is used to decide whether the traffic should be forwarded or not.
+.TP
+.BR "hello \fITIME"
+PIM Hello interval in seconds (or milliseconds if explicitly stated). The default value is 30 seconds. The dead neighbor detection delay is computed as '3.5 * hello_interval'.
+.TP
+.BR "join \fITIME"
+The PIM Join interval in seconds between two consecutive Joins (or in milliseconds if explicitly stated). The default value is 60 seconds.
+.TP
+.BR "llqc \fINUMBER"
+The MLDv2 and IGMPv3 Last Listener Query Count. The default value is 2.
+.TP
+.BR "robustness \fINUMBER"
+The MLDv2 and IGMPv3 robustness parameter. The default value is 2.
+.RE
+.SS group  \fI group-commands
+Display and configure group states.
+.TP
+.B list
+Dumps pimbd group state in json format.
+.TP
+.B set 
+group 
+.I group-address
+[ dev 
+.I link-name
+] [ source
+.I source-address
+] 
+options
+.RS
+.TP
+.BR "listener { include | exclude | none }"
+Configure multicast memberhsip on an interface. A device name must be specified. If a source address is set, the state is source-specific.
+.TP
+.BR "local { include | exclude | none }"
+Force local MLDv2 or IGMPv3 querier state. A device name must be specified. If a source address is set, the state is source-specific.
+.TP
+.BR "pim { include | exclude | none }"
+Force upstream PIM state to some specific state. The device name must
+.B not
+be set. If a source address is set, the state is source-specific.
+.RE
+.SS rpa \fI rpa-commands
+Display and configure rendez-vous point addresses.
+.TP
+.B list
+Dumps rendez-vous point state. That includes RPA mappings as well as per pim interface designated forwarder election state.
+.TP
+.B { add | del } \fIADDRESS GROUP_PREFIX
+Add or deletes a rendez-vous point address to group prefix mapping. Designated forwarder election for a given RPA is automatically started when the RPA is associated with at least one group prefix.
+.TP
+.B flush \fIADDRESS
+Removes all mapped group prefixes for the given RPA.
+.TP
+.B set \fIADDRESS \fB[ rpl_jp { on | off } ]
+Configures a given RPA. rpl_jp is, for now, the only option, and enables or disables sending Join/Prune messages on the RP Link.
+.SS proxy  \fI proxy-commands
+Configures proxy-controller behavior.
+.TP
+.B list
+Dumps the list of controlled proxies as well as their current status.
+.TP
+.B { add | del } ADDRESS PORT
+Add or remove a PIM border proxy. All PIM upstream state is replicated to the PIM border proxy.
+.SS raw \fIJSON
+Directly sends the provided JSON argument to pimb-ipc.
+.SS file \fIFILE-PATH
+Reads the provided file line by line and pass those lines as arguments to pimbc (along with optional arguments). Empty lines and lines starting with '#' are ignored.
+.SH SEE ALSO
+pimbd(8)
+.SH BUGS
+Gotta catch'em all.
+.SH AUTHORS
+Pierre Pfister (pierre at darou.fr)

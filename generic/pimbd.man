@@ -1,0 +1,66 @@
+.\" Manpage for pimbd.
+.\" Contact pierre at darou.fr to correct errors or typos.
+.TH pimbd 8
+
+.SH NAME
+pimbd \- PIM BIDIR dual-stack daemon.
+
+
+.SH SYNOPSIS
+.B pimbd
+[\fB\-h\fR]
+[\fB\-c\fR \fIconfig-file\fR]
+[\fB\-s\fR \fIipc-sock-path\fR]
+[\fB\-S\fR]
+[\fB\-l\fR \fIlog-file\fR]
+[\fB\-p\fR \fIpid-file\fR]
+
+
+.SH DESCRIPTION
+.B pimbd 
+is a PIM BIDIR implementation enabling IPv6 and IPv4 multicast forwarding based on IPv6 PIM messages. 
+It supports dynamic configuration via IPC (see 
+.B pimbc
+) and therefore accepts a very limited set of arguments in its command-line. 
+Additionaly, it includes a source-specific backward compatible extension called PIM-SSBIDIR 
+and a dynamic proxy extension.
+
+
+.SH OPTIONS
+
+.TP
+.BI \-h
+Display help message.
+
+.TP
+.BI \-c " config-file"
+Specify a configuration file consisting of per-line ipc configuration commands. It is equivalent to calling 
+.B pimbc file config-file
+immediatly after startup.
+
+.TP
+.BI \-s " ipc-sock-path"
+Specify a custom ipc unix socket path. The default is 
+.BR /tmp/pimbd_ipc_server.sock \fR.
+The same default is used by 
+.B pimbc \fR.
+
+.TP
+.BI \-S
+Use syslog instead of standard output for logging messages.
+
+.TP
+.BI \-l " log-file"
+Specify a log file instead of standard output.
+
+.TP
+.BI \-p " pid-file"
+Specify a pid file into which the process id is written after startup.
+
+
+.SH SEE ALSO
+pimbc(8)
+.SH BUGS
+Gotta catch'em all.
+.SH AUTHOR
+Pierre Pfister (pierre at darou.fr)

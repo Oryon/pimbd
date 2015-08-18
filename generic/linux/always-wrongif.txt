@@ -1,0 +1,26 @@
+"Always Wrongif" patch rationals...
+
+Linux multicast forwarding is very very PIM oriented. It was designed for PIM SM, extended for SSM, and extended again for multicast proxying, ending up with a lot of complex operation modes.
+
+IMO, a more generic approach would have consisted in a table of source-specific entries specifying input interfaces and output interfaces, with possibly multiple entries for the same (S,G) with different input interfaces.
+For example, we could have had:
+(S1,G1,eth0) -> eth1 eth2 eth3
+(S1,G1,eth1) -> eth2 eth3
+(S2,G2,eth1) -> eth0 eth1
+
+Having multiple entries for the same (S,G) is currently not possible. Probably because it is expected that traffic from a given source should not come from two different interfaces. That is true with PIM, but is not always true.
+
+But doing that would not really be backward compatible, or create a completely new interface. Would be nice if someone could do it, but well... 
+
+
+The actual patch is an intermediate solution, fixing an even more annoying PIM-SM-oriented 'feature'. The assert mechanism.
+
+In PIM-SM, traffic is always sent from the upstream interface to downstream interfaces (upstream being toward the RP, or the source, using the RPF path). And we want to receive assert notifications when someone else forwards traffic on an interface which is one of our output interface for the considered traffic. When the upstream interface changes, the route toward the root of the tree also changes, so we get a notification from the RP, and we can flush the routing state. So all is well with PIM-SM.
+
+But that is not satisfactory for PIM-BIDIR, because traffic is also forwarded from downstream interfaces toward upstream interfaces. And the traffic can very well suddenly come from a different downstream interface if there was a change in the downstream network topology (And the router does not know anything about that change). The current fix to this problem consists in using very short lived multicast route entries... But that is a hack and adds CPU load and delay.
+
+The patch, herewith proposed, modifies the assert notification mechanism such that we get traffic notification from any interface (not only output interfaces). This way, it is possible to react when the traffic suddenly comes from a different interface (And this approach could be used by PIM-SM as well, which makes it more generic).
+
+It allows setting the MRT_ASSERT and MRT6_ASSERT socket options to 2 (instead of just 1 or 0). The support for this option can also be dynamically checked, because previous version was only supporting 0 or 1.
+
+

@@ -1,0 +1,44 @@
+diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+index 3a2c016..bcfc01a 100644
+--- a/net/ipv4/ipmr.c
++++ b/net/ipv4/ipmr.c
+@@ -82,7 +82,7 @@ struct mr_table {
+ 	struct vif_device	vif_table[MAXVIFS];
+ 	int			maxvif;
+ 	atomic_t		cache_resolve_queue_len;
+-	bool			mroute_do_assert;
++	char			mroute_do_assert;
+ 	bool			mroute_do_pim;
+ #if defined(CONFIG_IP_PIMSM_V1) || defined(CONFIG_IP_PIMSM_V2)
+ 	int			mroute_reg_vif_num;
+@@ -1861,7 +1861,7 @@ static void ip_mr_forward(struct net *net, struct mr_table *mrt,
+ 		     * It is bad, but otherwise we would need to move pretty
+ 		     * large chunk of pimd to kernel. Ough... --ANK
+ 		     */
+-		    (mrt->mroute_do_pim ||
++		    (mrt->mroute_do_pim || (mrt->mroute_do_assert == 2) ||
+ 		     cache->mfc_un.res.ttls[true_vifi] < 255) &&
+ 		    time_after(jiffies,
+ 			       cache->mfc_un.res.last_assert + MFC_ASSERT_THRESH)) {
+diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
+index 74ceb73..c8be3d8 100644
+--- a/net/ipv6/ip6mr.c
++++ b/net/ipv6/ip6mr.c
+@@ -65,7 +65,7 @@ struct mr6_table {
+ 	struct mif_device	vif6_table[MAXMIFS];
+ 	int			maxvif;
+ 	atomic_t		cache_resolve_queue_len;
+-	bool			mroute_do_assert;
++	char			mroute_do_assert;
+ 	bool			mroute_do_pim;
+ #ifdef CONFIG_IPV6_PIMSM_V2
+ 	int			mroute_reg_vif_num;
+@@ -2119,7 +2119,7 @@ static void ip6_mr_forward(struct net *net, struct mr6_table *mrt,
+ 		       It is bad, but otherwise we would need to move pretty
+ 		       large chunk of pimd to kernel. Ough... --ANK
+ 		     */
+-		    (mrt->mroute_do_pim ||
++		    (mrt->mroute_do_pim || (mrt->mroute_do_assert == 2) ||
+ 		     cache->mfc_un.res.ttls[true_vifi] < 255) &&
+ 		    time_after(jiffies,
+ 			       cache->mfc_un.res.last_assert + MFC_ASSERT_THRESH)) {
