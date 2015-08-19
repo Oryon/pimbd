@@ -85,13 +85,14 @@ error () {
 	exit 1
 }
 
-while [ "$1" != "" -a "${1:0:1}" = "-" ]; do
+while true ; do
 	case "$1" in
 		"-s") OPTIONS="$OPTIONS -s $2"; shift 2;;
 		"-d") OPTIONS="$OPTIONS -d"; DRY_RUN="1"; shift 1;;
 		"-v") OPTIONS="$OPTIONS -v"; VERBOSE="1"; shift 1;;
 		"-t") OPTIONS="$OPTIONS -t $2"; shift 2;;
-		*) error "Unknown option '$1'.";;
+		-*) error "Unknown option '$1'.";;
+		*)  stop=1;;
 	esac
 done
 
