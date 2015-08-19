@@ -92,7 +92,7 @@ while true ; do
 		"-v") OPTIONS="$OPTIONS -v"; VERBOSE="1"; shift 1;;
 		"-t") OPTIONS="$OPTIONS -t $2"; shift 2;;
 		-*) error "Unknown option '$1'.";;
-		*)  stop=1;;
+		*)  break;;
 	esac
 done
 
