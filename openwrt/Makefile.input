@@ -19,6 +19,9 @@ include $(INCLUDE_DIR)/cmake.mk
 # Spammy debug builds for now
 CMAKE_OPTIONS += -DL_LEVEL=7
 
+# OpenWrt has the libubox library included
+CMAKE_OPTIONS += -DWITH_LIBUBOX=1
+
 define Package/pimbd
   SECTION:=net
   CATEGORY:=Network

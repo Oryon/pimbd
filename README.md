@@ -61,8 +61,22 @@ Built with Multicast Forwarding support
 cmake
 
 #### Linked libraries
-libubox: http://git.openwrt.org/project/libubox.git
 
+pimbd makes use of libubox, which is included as a git submodule.
+By default, you don't need to install libubox, but make sure you enabled git submodules in the source directory:
+$  git submodule init
+$  git submodule update
+
+And also make sure you have libjson-c installed:
+$  apt-get install libjson-c-dev
+
+If you want to install libubox, try this:
+$  apt-get install liblua5.1-0-dev
+$  git clone http://git.openwrt.org/project/libubox.git
+$  (cd libubox && cmake . && make && sudo make install)
+
+If you have libubox installed on your system, use the WITH_LIBUBOX cmake option.
+$  cmake . -DWITH_LIBUBOX=1
 
 ## How-To
 
