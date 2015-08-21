@@ -287,8 +287,19 @@ static void mrib_receive_mrt(struct uloop_fd *fd, __unused unsigned flags)
 	struct sockaddr_in from;
 
 	while (true) {
-		struct iovec iov = {buf, sizeof(buf)};
-		struct msghdr hdr = {&from, sizeof(from), &iov, 1, cbuf, sizeof(cbuf), 0};
+		struct iovec iov = {
+				.iov_base = buf,
+				.iov_len = sizeof(buf)
+		};
+		struct msghdr hdr = {
+				.msg_name = &from,
+				.msg_namelen = sizeof(from),
+				.msg_iov = &iov,
+				.msg_iovlen = 1,
+				.msg_control = cbuf,
+				.msg_controllen = sizeof(cbuf),
+				.msg_flags = 0
+		};
 
 		ssize_t len = recvmsg(fd->fd, &hdr, MSG_DONTWAIT);
 		MRIB_DEBUG("mrib_receive_mrt %d (%d:%s)", (int) len, errno, strerror(errno));
@@ -389,8 +400,19 @@ static void mrib_receive_mrt6(struct uloop_fd *fd, __unused unsigned flags)
 	struct sockaddr_in6 from;
 
 	while (true) {
-		struct iovec iov = {buf, sizeof(buf)};
-		struct msghdr hdr = {&from, sizeof(from), &iov, 1, cbuf, sizeof(cbuf), 0};
+		struct iovec iov = {
+				.iov_base = buf,
+				.iov_len = sizeof(buf)
+		};
+		struct msghdr hdr = {
+				.msg_name = &from,
+				.msg_namelen = sizeof(from),
+				.msg_iov = &iov,
+				.msg_iovlen = 1,
+				.msg_control = cbuf,
+				.msg_controllen = sizeof(cbuf),
+				.msg_flags = 0
+		};
 
 		ssize_t len = recvmsg(fd->fd, &hdr, MSG_DONTWAIT);
 		MRIB_DEBUG("mrib_receive_mrt6 %d (%d:%s)", (int) len, errno, strerror(errno));
