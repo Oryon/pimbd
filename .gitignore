@@ -16,3 +16,6 @@ coverage
 install_manifest.txt
 omgproxy
 *~
+examples/*.log
+examples/*.pid
+examples/*.sock

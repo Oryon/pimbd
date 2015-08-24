@@ -228,6 +228,7 @@ int ipc_client_raw(const struct blob_buf *req,
 			setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(struct timeval)) ||
 			setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(struct timeval))) {
 		close(sock);
+		unlink(clientaddr.sun_path);
 		return -errno;
 	}
 
@@ -239,6 +240,7 @@ int ipc_client_raw(const struct blob_buf *req,
 						ioctl(sock, FIONREAD, &avail)) {
 			if((errno != ECONNREFUSED && errno != EAGAIN) || tentatives == (client_tentatives - 1)) {
 				close(sock);
+				unlink(clientaddr.sun_path);
 				return -errno;
 			}
 			L_INFO("%s - Retry in %d seconds", strerror(errno), IPC_CLIENT_SLEEP_S);
@@ -250,21 +252,25 @@ int ipc_client_raw(const struct blob_buf *req,
 
 	if(!avail) {
 		close(sock);
+		unlink(clientaddr.sun_path);
 		return -ECONNABORTED;
 	}
 
 	if(!(*data = malloc(avail))) {
 		close(sock);
+		unlink(clientaddr.sun_path);
 		return -ENOMEM;
 	}
 
 	if((avail = recv(sock, *data, avail, 0)) < 0) {
 		free(*data);
 		close(sock);
+		unlink(clientaddr.sun_path);
 		return -errno;
 	}
 
 	*len = avail;
+	unlink(clientaddr.sun_path);
 	return 0;
 }
 
