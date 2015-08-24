@@ -201,7 +201,7 @@ int ipc_init(ipc ipc, const char *sockpath)
 
 void ipc_add_user(ipc ipc, struct ipc_user *user)
 {
-	L_INFO("Adding ipc command '%s'", user->command);
+	//L_INFO("Adding ipc command '%s'", user->command);
 	list_add(&user->le, &ipc->users);
 }
 
