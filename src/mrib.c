@@ -54,7 +54,7 @@ struct mrib_iface {
 	struct uloop_timeout timer;
 };
 
-static uint32_t ipv4_rtr_alert = cpu_to_be32(0x94040000);
+static uint32_t ipv4_rtr_alert = __constant_cpu_to_be32(0x94040000);
 static struct {
 	struct ip6_hbh hdr;
 	struct ip6_opt_router rt;
