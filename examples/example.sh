@@ -34,9 +34,7 @@ for i in `seq 0 4`; do
 	sudo ip netns add "${NS}${i}" || stop 2 "Could not create namespace $NS$i"
 	(
 	sudo ip netns exec $NS$i sysctl -w net.ipv6.conf.all.forwarding=1 && 
-	sudo ip netns exec $NS$i sysctl -w net.ipv6.conf.all.mc_forwarding=1 && 
 	sudo ip netns exec $NS$i sysctl -w net.ipv4.conf.all.forwarding=1 && 
-	sudo ip netns exec $NS$i sysctl -w net.ipv4.conf.all.mc_forwarding=1 && 
 	sudo ip netns exec $NS$i sysctl -w net.ipv4.ip_forward=1 && 
 	sudo ip netns exec $NS$i sysctl -w net.ipv4.icmp_echo_ignore_broadcasts=0
 	) > /dev/null 2>&1 || stop 2 "Could not configure namespace $NS$i"
